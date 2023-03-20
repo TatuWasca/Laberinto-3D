@@ -1,16 +1,16 @@
 import pygame as pg
 import sys
 import configparser
-from menu import *
 from os import path
-from settings import *
-from map import *
-from player import *
-from raycasting import *
-from object_renderer import *
-from sprite_object import *
-from object_handler import *
-from pathfinding import *
+from src.menu import *
+from src.settings import *
+from src.map import *
+from src.player import *
+from src.raycasting import *
+from src.object_renderer import *
+from src.sprite_object import *
+from src.object_handler import *
+from src.pathfinding import *
 
 class Game:
     def __init__(self):
@@ -26,8 +26,10 @@ class Game:
     
     def load_data(self):
         # Starts the config parser
+        self.root_file = path.dirname(__file__)
+
         self.configParser = configparser.ConfigParser()
-        self.configFilePath = path.join(path.dirname(__file__), 'config.cfg')
+        self.configFilePath = path.join(self.root_file, 'config.cfg')
         self.configParser.read(self.configFilePath)
         
         self.general_vol = int(self.configParser.get("info","GENERAL_VOLUME"))
@@ -38,7 +40,7 @@ class Game:
         self.Textfont = pg.font.Font(self.font, 15)
         self.Smalltextfont = pg.font.Font(self.font, 10)
 
-        self.stamina_icon = pg.image.load(path.join(path.dirname(__file__), STAMINA_ICON)).convert_alpha()
+        self.stamina_icon = pg.image.load(path.join(self.root_file, STAMINA_ICON)).convert_alpha()
         self.stamina_icon = pg.transform.smoothscale(self.stamina_icon, (40, 40))
 
         self.main_menu = MainMenu(self)
@@ -51,8 +53,11 @@ class Game:
 
         self.effects_sounds = {}
         for type in EFFECT_SOUNDS:
-            self.effects_sounds[type] = pg.mixer.Sound(path.join(path.dirname(__file__), EFFECT_SOUNDS[type]))
-            self.effects_sounds[type].set_volume(self.general_vol / 100)
+            self.effects_sounds[type] = pg.mixer.Sound(path.join(self.root_file, EFFECT_SOUNDS[type]))
+            if type in ['chase_music', 'ambient_music']:
+                self.effects_sounds[type].set_volume(self.music_vol / 100)
+            else:
+                self.effects_sounds[type].set_volume(self.general_vol / 100)
 
         self.playing = False
 
@@ -85,20 +90,32 @@ class Game:
         self.player.update()
         self.raycasting.update()
         self.object_handler.update()
-        self.draw_text('FPS: ' +  "{:.0f}".format(self.clock.get_fps()),10, 5, 10, 'left')
         pg.display.flip()
         self.delta_time = self.clock.tick(FPS)
 
     def draw(self):
         if self.playing:
-            self.screen.fill(BLACK)
+            self.screen.fill(DARKGREY)
             self.object_renderer.draw()
             self.draw_hud()
     
     def draw_hud(self):
+        # Fps
+        self.draw_text('FPS: ' +  "{:.0f}".format(self.clock.get_fps()),10, 5, 10, 'left')
+
+        # Stamina bar
+        self.pathfinding.get_path(self.object_handler.npc.map_pos, self.player.map_pos)
+        color = 'white'
+        if len(self.pathfinding.path) <= 15:
+            color = 'red'
+        elif len(self.pathfinding.path) <= 30:
+            color = 'yellow'
+        else:
+            color = 'white'
+
         self.screen.blit(self.stamina_icon, (10, MONITOR_H - 50))
-        pg.draw.rect(self.screen, 'white', pg.Rect(60, MONITOR_H - 40, int(self.player.stamina) * 2.5, 25))
-        pg.draw.rect(self.screen, 'green', pg.Rect(60, MONITOR_H - 40, 250, 25) , 1)
+        pg.draw.rect(self.screen, color, pg.Rect(60, MONITOR_H - 40, int(self.player.stamina) * 2.5, 25))
+        pg.draw.rect(self.screen, 'green', pg.Rect(60, MONITOR_H - 40, 375, 25) , 1)
     
     def draw_text(self, text, size, x, y, align):
         # Checks size
