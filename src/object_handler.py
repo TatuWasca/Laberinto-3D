@@ -1,3 +1,4 @@
+import pygame as pg
 from os import path
 from src.map import *
 from src.sprite_object import *
@@ -26,6 +27,7 @@ class ObjectHandler:
         if self.key_rect.colliderect(self.game.player.player_rect):
             self.picked = True
             self.text_time = pg.time.get_ticks() + 4500
+            self.game.effects_sounds['key_grab'].play()
             
             # Reloads map
             MINI_MAP[DOOR_POS[0][0]][DOOR_POS[0][1]] = False

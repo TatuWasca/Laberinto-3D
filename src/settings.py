@@ -24,6 +24,8 @@ EFFECT_SOUNDS = {
                 'ambient1':        'resources/sounds/ambient_noise1.wav',
                 'ambient2':        'resources/sounds/ambient_noise2.wav',
                 'ambient3':        'resources/sounds/ambient_noise3.wav',
+                'ambient4':        'resources/sounds/ambient_noise4.wav',
+                'key_grab':      'resources/sounds/key_grab.wav',
                 'npc_scream':      'resources/sounds/npc_scream.wav',
                 'running':         'resources/sounds/running.wav',
                 'steps':           'resources/sounds/steps.wav'
@@ -32,7 +34,7 @@ EFFECT_SOUNDS = {
 # Player settings
 PLAYER_ANGLE = 0
 PLAYER_WALKING_SPEED = 0.001
-PLAYER_RUNNING_SPEED = 0.003
+PLAYER_RUNNING_SPEED = 0.005
 PLAYER_ROT_SPEED = 0.002
 PLAYER_SIZE_SCALE = 100
 STAMINA_ICON = 'resources/textures/stamina_icon.png'

@@ -48,12 +48,13 @@ class NPC(AnimatedSprite):
                 if now > self.screen_effect_time:
                     self.screen_effect_time = now + 350
                     self.game.screen.fill('red')
+
             if self.roaming:
-                self.next_mob_movement = now + 10
+                self.next_mob_movement = now + 15
             elif self.searching:
-                self.next_mob_movement = now + 5
+                self.next_mob_movement = now + 10
             else:
-                self.next_mob_movement = now 
+                self.next_mob_movement = now + 5
                 self.ambient_noise_chance = now + 15000
 
             self.check_collision()
