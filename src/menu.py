@@ -344,9 +344,9 @@ class PauseMenu(Menu):
                 for y in range(MAP_HEIGHT - 1):
                     for x in range(MAP_WIDTH - 1):
                         if (x, y) in self.game.map.posible_spawns:
-                            MINI_MAP[y][x] = 3
+                            MINI_MAP[y][x] = 5
                         elif (x, y) in self.game.map.door_spawns:
-                            MINI_MAP[y][x] = 2
+                            MINI_MAP[y][x] = 4
                 self.game.curr_menu = self.game.main_menu
             self.run_display = False
 

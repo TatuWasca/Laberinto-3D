@@ -27,8 +27,5 @@ class ObjectRenderer:
             2: self.get_texture(path.join(self.game.root_file, 'resources/textures/2.png')),
             3: self.get_texture(path.join(self.game.root_file, 'resources/textures/3.png')),
             4: self.get_texture(path.join(self.game.root_file, 'resources/textures/4.png')),
-            5: self.get_texture(path.join(self.game.root_file, 'resources/textures/5.png')),
-            6: self.get_texture(path.join(self.game.root_file, 'resources/textures/6.png')),
-            7: self.get_texture(path.join(self.game.root_file, 'resources/textures/7.png')),
-            8: self.get_texture(path.join(self.game.root_file, 'resources/textures/8.png'))
+            5: self.get_texture(path.join(self.game.root_file, 'resources/textures/5.png'))
         }

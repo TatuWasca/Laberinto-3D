@@ -9,6 +9,7 @@ class NPC(AnimatedSprite):
     def __init__(self, game, path, pos, scale, shift, animation_time):
         super().__init__(game, path, pos, scale, shift, animation_time)
         self.game = game
+        self.idle_images = self.get_images(self.path)
         self.grid_x, self.grid_y = Decimal(pos[0]) - Decimal('0.5'), Decimal(pos[1]) - Decimal('0.5')
         self.direction = random.choice( [ 'N', 'S', 'E', 'W' ] ) 
         self.next_mob_movement = pg.time.get_ticks()
@@ -25,6 +26,7 @@ class NPC(AnimatedSprite):
         self.check_animation_time()
         self.get_sprite()
         self.run_logic()
+        self.animate(self.idle_images)
 
     def movement(self):
         if self.direction == 'N':

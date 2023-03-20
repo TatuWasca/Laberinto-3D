@@ -28,33 +28,33 @@ class Map:
         # Get all exit positions and choose one, then filter it out
         for y in range(MAP_HEIGHT - 1):
             for x in range(MAP_WIDTH - 1):
-                if MINI_MAP[y][x] == 3:
+                if MINI_MAP[y][x] == 5:
                     self.posible_spawns.append((x,y))
                     MINI_MAP[y][x] = False
-                elif MINI_MAP[y][x] == 2:
+                elif MINI_MAP[y][x] == 4:
                     self.door_spawns.append((x,y))
         spawns = self.posible_spawns
         EXIT_POS[0] = random.choice(spawns)
-        MINI_MAP[EXIT_POS[0][1]][EXIT_POS[0][0]] = 3
+        MINI_MAP[EXIT_POS[0][1]][EXIT_POS[0][0]] = 5
         spawns = list(self.filter_spawns(EXIT_POS[0], spawns))
 
         # Based on exit position, get door position
         e_x, e_y = EXIT_POS[0][0], EXIT_POS[0][1]
-        if MINI_MAP[e_y - 1][e_x] == 2:
+        if MINI_MAP[e_y - 1][e_x] == 4:
             DOOR_POS[0] = (e_y - 1, e_x)
-        elif MINI_MAP[e_y][e_x + 1] == 2:
+        elif MINI_MAP[e_y][e_x + 1] == 4:
             DOOR_POS[0] = (e_y, e_x + 1)
-        elif MINI_MAP[e_y + 1][e_x] == 2:
+        elif MINI_MAP[e_y + 1][e_x] == 4:
             DOOR_POS[0] = (e_y + 1, e_x)
-        elif MINI_MAP[e_y][e_x - 1] == 2:
+        elif MINI_MAP[e_y][e_x - 1] == 4:
             DOOR_POS[0] = (e_y, e_x - 1)
         
         # Reeplace all door with path except the one thats in the exit
         for y in range(MAP_HEIGHT - 1):
             for x in range(MAP_WIDTH - 1):
-                if MINI_MAP[y][x] == 2:
+                if MINI_MAP[y][x] == 4:
                     MINI_MAP[y][x] = False
-        MINI_MAP[DOOR_POS[0][0]][DOOR_POS[0][1]] = 2
+        MINI_MAP[DOOR_POS[0][0]][DOOR_POS[0][1]] = 4
 
         player_spawn = random.choice(spawns)
         PLAYER_POS[0] = float(Decimal(player_spawn[0]) + Decimal('0.5')), float(Decimal(player_spawn[1]) + Decimal('0.5'))

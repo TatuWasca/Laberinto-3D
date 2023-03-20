@@ -8,7 +8,7 @@ class ObjectHandler:
     def __init__(self, game):
         self.game = game
         self.sprite_list = []
-        self.npc = NPC(game, path.join(self.game.root_file,'resources/sprites/animated/enemy.png'), NPC_POS[0], 0.9, 0.1, 180)
+        self.npc = NPC(game, path.join(self.game.root_file, CURR_NPC), NPC_POS[0], 0.9, 0.1, 90)
         self.key = SpriteObject(game, path.join(self.game.root_file,'resources/sprites/static/key.png'), KEY_POS[0], 0.3, 0.7)
         self.key_rect = pg.Rect((KEY_POS[0][0] - 0.25) * 100, (KEY_POS[0][1] - 0.25) * 100, 25, 25)
         self.picked = False
@@ -49,9 +49,9 @@ class ObjectHandler:
         for y in range(MAP_HEIGHT - 1):
             for x in range(MAP_WIDTH - 1):
                 if (x, y) in self.game.map.posible_spawns:
-                    MINI_MAP[y][x] = 3
+                    MINI_MAP[y][x] = 5
                 elif (x, y) in self.game.map.door_spawns:
-                    MINI_MAP[y][x] = 2
+                    MINI_MAP[y][x] = 4
 
         self.game.curr_menu = self.game.gameover_menu
         self.game.playing = False
@@ -62,9 +62,9 @@ class ObjectHandler:
         for y in range(MAP_HEIGHT - 1):
             for x in range(MAP_WIDTH - 1):
                 if (x, y) in self.game.map.posible_spawns:
-                    MINI_MAP[y][x] = 3
+                    MINI_MAP[y][x] = 5
                 elif (x, y) in self.game.map.door_spawns:
-                    MINI_MAP[y][x] = 2
+                    MINI_MAP[y][x] = 4
                     
         self.game.curr_menu = self.game.win_menu
         self.game.playing = False
