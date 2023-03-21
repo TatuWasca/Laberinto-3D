@@ -168,23 +168,23 @@ class NPC(AnimatedSprite):
         else:
             if y > map_y:
                 if x > map_x:
-                    if MINI_MAP[map_y][map_x + 1] not in [1, 2, 3, 4, 5, 6, 7, 8]:
+                    if self.game.map.mini_map[map_y][map_x + 1] not in [1, 2, 3, 4, 5]:
                         self.direction = 'E'
                     else:
                         self.direction = 'S'
                 else:
-                    if MINI_MAP[map_y][map_x - 1] not in [1, 2, 3, 4, 5, 6, 7, 8]:
+                    if self.game.map.mini_map[map_y][map_x - 1] not in [1, 2, 3, 4, 5]:
                         self.direction = 'W'
                     else:
                         self.direction = 'S'
             else:
                 if x > map_x:
-                    if MINI_MAP[map_y][map_x + 1] not in [1, 2, 3, 4, 5, 6, 7, 8]:
+                    if self.game.map.mini_map[map_y][map_x + 1] not in [1, 2, 3, 4, 5]:
                         self.direction = 'E'
                     else:
                         self.direction = 'N'
                 else:
-                    if MINI_MAP[map_y][map_x - 1] not in [1, 2, 3, 4, 5, 6, 7, 8]:
+                    if self.game.map.mini_map[map_y][map_x - 1] not in [1, 2, 3, 4, 5]:
                         self.direction = 'W'
                     else:
                         self.direction = 'N'
@@ -193,13 +193,13 @@ class NPC(AnimatedSprite):
         #Consult the map to see where is good to go from here
         map_x, map_y = (int(self.grid_x), int(self.grid_y))
         exits = []
-        if MINI_MAP[map_y - 1][map_x] not in [1, 2, 3]:
+        if self.game.map.mini_map[map_y - 1][map_x] not in [1, 2, 3, 4, 5]:
             exits.append('N')
-        if MINI_MAP[map_y][map_x + 1] not in [1, 2, 3]:
+        if self.game.map.mini_map[map_y][map_x + 1] not in [1, 2, 3, 4, 5]:
             exits.append('E')
-        if MINI_MAP[map_y + 1][map_x] not in [1, 2, 3]:
+        if self.game.map.mini_map[map_y + 1][map_x] not in [1, 2, 3, 4, 5]:
             exits.append('S')
-        if MINI_MAP[map_y][map_x - 1] not in [1, 2, 3]:
+        if self.game.map.mini_map[map_y][map_x - 1] not in [1, 2, 3, 4, 5]:
             exits.append('W')
         return exits
 

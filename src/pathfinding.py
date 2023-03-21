@@ -1,10 +1,9 @@
 from collections import deque
-from src.settings import *
 
 class PathFinding:
     def __init__(self, game):
         self.game = game
-        self.map = MINI_MAP
+        self.map = self.game.map.mini_map
         self.ways = [-1, 0], [0, -1], [1, 0], [0, 1], [-1, -1], [1, -1], [1, 1], [-1, 1]
         self.graph = {}
         self.path = []

@@ -1,6 +1,7 @@
 import pygame as pg
 import sys
 from os import path
+from src.map import *
 from src.settings import *
 
 ########################################(Menu superclass)########################################
@@ -341,12 +342,11 @@ class PauseMenu(Menu):
                 pg.mixer.music.set_volume(self.game.music_vol / 100)
                 pg.mixer.music.play(loops=-1)
 
-                for y in range(MAP_HEIGHT - 1):
-                    for x in range(MAP_WIDTH - 1):
-                        if (x, y) in self.game.map.posible_spawns:
-                            MINI_MAP[y][x] = 5
-                        elif (x, y) in self.game.map.door_spawns:
-                            MINI_MAP[y][x] = 4
+                # Reloads map
+                self.game.map.mini_map = generate_grid_maze()
+                self.game.map.world_map = {}
+                self.game.map.get_map()
+
                 self.game.curr_menu = self.game.main_menu
             self.run_display = False
 

@@ -6,7 +6,7 @@ from src.settings import *
 class Player:
     def __init__(self, game):
         self.game = game
-        self.x, self.y = PLAYER_POS[0]
+        self.x, self.y = self.game.map.player_spawn
         self.angle = PLAYER_ANGLE
         self.rel = 0
         self.time_prev = pg.time.get_ticks()
