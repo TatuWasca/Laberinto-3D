@@ -19,7 +19,7 @@ class NPC(AnimatedSprite):
         self.screen_effect = False
         self.chaise_audio = True
         self.screen_effect_time = 350
-        self.chasing_time = 3500
+        self.chasing_time = 4500
         self.ambient_noise_chance_time = 15000
 
     def update(self):
@@ -122,7 +122,7 @@ class NPC(AnimatedSprite):
                     self.game.effects_sounds['chase_music'].play(loops=-1)
                     self.game.effects_sounds['npc_scream'].play()
                     self.chaise_audio = False
-                self.chasing_time = pg.time.get_ticks() + 3500
+                self.chasing_time = pg.time.get_ticks() + 4500
                 # Calculates the next position
                 next_pos = self.game.pathfinding.get_path(self.map_pos, self.game.player.map_pos)
                 next_x, next_y = next_pos  
