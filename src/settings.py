@@ -61,7 +61,7 @@ HALF_TEXTURE_SIZE = TEXTURE_SIZE // 2
 
 # NPC settings
 NPC1 = 'resources/sprites/animated/npc1/walking1.png'
-NPC2 = 'resources/sprites/animated/npc2/walking2.png'
-NPC3 = 'resources/sprites/animated/npc3/walking3.png'
-CURR_NPC = NPC1
+NPC2 = 'resources/sprites/animated/npc2/enemy2.png'
+NPC3 = 'resources/sprites/animated/npc3/enemy3.png'
+NPC4 = 'resources/sprites/animated/npc4/enemy4.png'
 MOB_SPEED = Decimal('0.025')

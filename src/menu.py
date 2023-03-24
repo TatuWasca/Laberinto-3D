@@ -50,6 +50,16 @@ class Menu:
                     self.LEFT_KEY = True
                 if event.key == pg.K_RIGHT or event.key == pg.K_d:
                     self.RIGHT_KEY = True
+                if self.game.curr_menu == self.game.difficulty_menu:
+                    if event.key == pg.K_h:
+                        self.game.curr_npc = NPC1
+                    elif event.key == pg.K_j:
+                        self.game.curr_npc = NPC2
+                    elif event.key == pg.K_k:
+                        self.game.curr_npc = NPC3
+                    elif event.key == pg.K_l:
+                        self.game.curr_npc = NPC4
+
 
 ########################################(MainMenu class)########################################
 class MainMenu(Menu):
@@ -556,13 +566,6 @@ class GameoverMenu(Menu):
         self.move_cursor()
         if self.START_KEY:
             if self.state == 'Retry':
-                # Reloads map
-                self.rows, self.cols = 8 + self.game.difficulty_menu.difficulty * 2, 8 + self.game.difficulty_menu.difficulty * 2
-                self.map_height, self.map_width = self.rows * 2 + 1, self.cols * 2 + 1
-                self.game.map.mini_map = generate_grid_maze(self.rows, self.cols, self.map_height, self.map_width)
-                self.game.map.world_map = {}
-                self.game.map.get_map()
-
                 self.game.effects_sounds['ambient_music'].play(loops=-1)
                 self.game.new_game()
                 self.game.playing = True
@@ -632,13 +635,6 @@ class WinMenu(Menu):
         self.move_cursor()
         if self.START_KEY:
             if self.state == 'Retry':
-                # Reloads map
-                self.rows, self.cols = 8 + self.game.difficulty_menu.difficulty * 2, 8 + self.game.difficulty_menu.difficulty * 2
-                self.map_height, self.map_width = self.rows * 2 + 1, self.cols * 2 + 1
-                self.game.map.mini_map = generate_grid_maze(self.rows, self.cols, self.map_height, self.map_width)
-                self.game.map.world_map = {}
-                self.game.map.get_map()
-
                 self.game.effects_sounds['ambient_music'].play(loops=-1)
                 self.game.playing = True
                 self.game.new_game()

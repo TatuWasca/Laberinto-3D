@@ -52,6 +52,8 @@ class Game:
         self.gameover_menu = GameoverMenu(self)
         self.win_menu = WinMenu(self)
         self.curr_menu = self.main_menu
+        
+        self.curr_npc = NPC1
 
         self.effects_sounds = {}
         for type in EFFECT_SOUNDS:

@@ -8,7 +8,7 @@ class ObjectHandler:
     def __init__(self, game):
         self.game = game
         self.sprite_list = []
-        self.npc = NPC(game, path.join(self.game.root_file, CURR_NPC), self.game.map.npc_spawn, 0.9, 0.1, 90)
+        self.npc = NPC(game, path.join(self.game.root_file, self.game.curr_npc), self.game.map.npc_spawn, 0.9, 0.1, 90)
         self.key = SpriteObject(game, path.join(self.game.root_file,'resources/sprites/static/key.png'), self.game.map.key_spawn, 0.3, 0.7)
         self.key_rect = pg.Rect((self.game.map.key_spawn[0] - 0.25) * 100, (self.game.map.key_spawn[1] - 0.25) * 100, 25, 25)
         self.picked = False
@@ -45,7 +45,9 @@ class ObjectHandler:
 
     def game_over(self):
         # Reloads map
-        self.game.map.mini_map = generate_grid_maze()
+        self.rows, self.cols = 8 + self.game.difficulty_menu.difficulty * 2, 8 + self.game.difficulty_menu.difficulty * 2
+        self.map_height, self.map_width = self.rows * 2 + 1, self.cols * 2 + 1
+        self.game.map.mini_map = generate_grid_maze(self.rows, self.cols, self.map_height, self.map_width)
         self.game.map.world_map = {}
         self.game.map.get_map()
 
@@ -54,8 +56,10 @@ class ObjectHandler:
         self.game.curr_menu.display_menu()
 
     def win(self):
-        # Resets map
-        self.game.map.mini_map = generate_grid_maze()
+        # Reloads map
+        self.rows, self.cols = 8 + self.game.difficulty_menu.difficulty * 2, 8 + self.game.difficulty_menu.difficulty * 2
+        self.map_height, self.map_width = self.rows * 2 + 1, self.cols * 2 + 1
+        self.game.map.mini_map = generate_grid_maze(self.rows, self.cols, self.map_height, self.map_width)
         self.game.map.world_map = {}
         self.game.map.get_map()
                     
