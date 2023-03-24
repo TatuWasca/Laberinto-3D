@@ -55,8 +55,6 @@ class Player:
         if keys[pg.K_d]:
             dx += -speed_sin
             dy += speed_cos
-        if keys[pg.K_m]:
-            self.game.map.draw()
 
         # Running
         now = pg.time.get_ticks()
@@ -117,7 +115,7 @@ class Player:
             pg.mouse.set_pos([HALF_WIDTH, HALF_HEIGHT])
         self.rel = pg.mouse.get_rel()[0]
         self.rel = max(-MOUSE_MAX_REL, min(MOUSE_MAX_REL, self.rel))
-        self.angle += self.rel * MOUSE_SENSITIVITY * self.game.delta_time
+        self.angle += self.rel * (self.game.sensitivity / 1000) 
 
     def update(self):
         self.movement()

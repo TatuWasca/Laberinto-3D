@@ -47,7 +47,7 @@ class NPC(AnimatedSprite):
         if now > self.next_mob_movement:
             # Determines npc speed, as well as ambient noise chance and screen effect
             if self.screen_effect:
-                if now > self.screen_effect_time:
+                if now > self.screen_effect_time and self.game.playing:
                     self.screen_effect_time = now + 350
                     self.game.screen.fill('red')
 

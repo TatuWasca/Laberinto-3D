@@ -40,7 +40,6 @@ PLAYER_SIZE_SCALE = 100
 STAMINA_ICON = 'resources/textures/stamina_icon.png'
 
 # Mouse settings
-MOUSE_SENSITIVITY = 0.00010
 MOUSE_MAX_REL = 40
 MOUSE_BORDER_LEFT = 100
 MOUSE_BORDER_RIGHT = MONITOR_W - MOUSE_BORDER_LEFT
@@ -66,7 +65,3 @@ NPC2 = 'resources/sprites/animated/npc2/walking2.png'
 NPC3 = 'resources/sprites/animated/npc3/walking3.png'
 CURR_NPC = NPC1
 MOB_SPEED = Decimal('0.025')
-
-# Map
-COLS, ROWS = 16, 16 #IMPORTANT: ONLY WORKS IF THE NUMBERS ARE THE SAME AND EVEN
-MAP_HEIGHT, MAP_WIDTH = ROWS * 2 + 1, COLS * 2 + 1

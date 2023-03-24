@@ -31,6 +31,7 @@ class Game:
         self.configFilePath = path.join(self.root_file, 'config.cfg')
         self.configParser.read(self.configFilePath)
         
+        self.sensitivity = int(self.configParser.get("info","SENSITIVITY"))
         self.general_vol = int(self.configParser.get("info","GENERAL_VOLUME"))
         self.music_vol = int(self.configParser.get("info","MUSIC_VOLUME"))
 
@@ -43,8 +44,10 @@ class Game:
         self.stamina_icon = pg.transform.smoothscale(self.stamina_icon, (40, 40))
 
         self.main_menu = MainMenu(self)
+        self.difficulty_menu = DifficultyMenu(self)
         self.options = OptionsMenu(self)
         self.credits = CreditsMenu(self)
+        self.about_menu = AboutMenu(self)
         self.pause_menu = PauseMenu(self)
         self.gameover_menu = GameoverMenu(self)
         self.win_menu = WinMenu(self)
@@ -84,6 +87,8 @@ class Game:
                     self.playing = False
                     self.curr_menu = self.pause_menu
                     self.curr_menu.display_menu()
+                if event.key == pg.K_TAB:
+                    self.map.toggle_map = not(self.map.toggle_map)
 
     def update(self):
         self.player.update()
@@ -101,7 +106,8 @@ class Game:
     def draw_hud(self):
         # Fps
         self.draw_text('FPS: ' +  "{:.0f}".format(self.clock.get_fps()),10, 5, 10, 'left')
-
+        # Map
+        self.map.draw()
         # Stamina bar
         self.pathfinding.get_path(self.object_handler.npc.map_pos, self.player.map_pos)
         color = 'white'
@@ -111,7 +117,6 @@ class Game:
             color = 'yellow'
         else:
             color = 'white'
-
         self.screen.blit(self.stamina_icon, (10, MONITOR_H - 50))
         pg.draw.rect(self.screen, color, pg.Rect(60, MONITOR_H - 40, int(self.player.stamina) * 2.5, 25))
         pg.draw.rect(self.screen, 'green', pg.Rect(60, MONITOR_H - 40, 375, 25) , 1)
