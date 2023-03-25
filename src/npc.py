@@ -19,7 +19,7 @@ class NPC(AnimatedSprite):
         self.screen_effect = False
         self.chaise_audio = True
         self.screen_effect_time = 350
-        self.chasing_time = 4500
+        self.chasing_time = pg.time.get_ticks() + 5000
         self.ambient_noise_chance_time = 15000
 
     def update(self):
@@ -46,7 +46,7 @@ class NPC(AnimatedSprite):
         now = pg.time.get_ticks()
         if now > self.next_mob_movement:
             # Determines npc speed, as well as ambient noise chance and screen effect
-            if self.screen_effect:
+            if self.screen_effect and self.game.curr_npc == NPC1:
                 if now > self.screen_effect_time and self.game.playing:
                     self.screen_effect_time = now + 350
                     self.game.screen.fill('red')
@@ -120,9 +120,10 @@ class NPC(AnimatedSprite):
                 if self.chaise_audio:
                     self.game.effects_sounds['ambient_music'].stop()
                     self.game.effects_sounds['chase_music'].play(loops=-1)
-                    self.game.effects_sounds['npc_scream'].play()
+                    if self.game.curr_npc == NPC1:
+                        self.game.effects_sounds['npc_scream'].play()
                     self.chaise_audio = False
-                self.chasing_time = pg.time.get_ticks() + 4500
+                self.chasing_time = pg.time.get_ticks() + 5000
                 # Calculates the next position
                 next_pos = self.game.pathfinding.get_path(self.map_pos, self.game.player.map_pos)
                 next_x, next_y = next_pos  

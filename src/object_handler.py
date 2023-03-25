@@ -44,25 +44,11 @@ class ObjectHandler:
             self.win()
 
     def game_over(self):
-        # Reloads map
-        self.rows, self.cols = 8 + self.game.difficulty_menu.difficulty * 2, 8 + self.game.difficulty_menu.difficulty * 2
-        self.map_height, self.map_width = self.rows * 2 + 1, self.cols * 2 + 1
-        self.game.map.mini_map = generate_grid_maze(self.rows, self.cols, self.map_height, self.map_width)
-        self.game.map.world_map = {}
-        self.game.map.get_map()
-
         self.game.curr_menu = self.game.gameover_menu
         self.game.playing = False
         self.game.curr_menu.display_menu()
 
     def win(self):
-        # Reloads map
-        self.rows, self.cols = 8 + self.game.difficulty_menu.difficulty * 2, 8 + self.game.difficulty_menu.difficulty * 2
-        self.map_height, self.map_width = self.rows * 2 + 1, self.cols * 2 + 1
-        self.game.map.mini_map = generate_grid_maze(self.rows, self.cols, self.map_height, self.map_width)
-        self.game.map.world_map = {}
-        self.game.map.get_map()
-                    
         self.game.curr_menu = self.game.win_menu
         self.game.playing = False
         self.game.curr_menu.display_menu()

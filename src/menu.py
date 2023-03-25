@@ -53,12 +53,20 @@ class Menu:
                 if self.game.curr_menu == self.game.difficulty_menu:
                     if event.key == pg.K_h:
                         self.game.curr_npc = NPC1
+                        self.game.effects_sounds['chase_music'] = pg.mixer.Sound(path.join(self.game.root_file, NPC1_CHASE))
+                        self.game.effects_sounds['chase_music'].set_volume(self.game.music_vol / 100)
                     elif event.key == pg.K_j:
                         self.game.curr_npc = NPC2
+                        self.game.effects_sounds['chase_music'] = pg.mixer.Sound(path.join(self.game.root_file, NPC2_CHASE))
+                        self.game.effects_sounds['chase_music'].set_volume(self.game.music_vol / 100 * 5)
                     elif event.key == pg.K_k:
                         self.game.curr_npc = NPC3
+                        self.game.effects_sounds['chase_music'] = pg.mixer.Sound(path.join(self.game.root_file, NPC3_CHASE))
+                        self.game.effects_sounds['chase_music'].set_volume(self.game.music_vol / 100 * 2)
                     elif event.key == pg.K_l:
                         self.game.curr_npc = NPC4
+                        self.game.effects_sounds['chase_music'] = pg.mixer.Sound(path.join(self.game.root_file, NPC4_CHASE))
+                        self.game.effects_sounds['chase_music'].set_volume(self.game.music_vol / 10 * 2)
 
 
 ########################################(MainMenu class)########################################
@@ -499,13 +507,6 @@ class PauseMenu(Menu):
                 pg.mixer.music.set_volume(self.game.music_vol / 100)
                 pg.mixer.music.play(loops=-1)
 
-                # Reloads map
-                self.rows, self.cols = 8 + self.game.difficulty_menu.difficulty * 2, 8 + self.game.difficulty_menu.difficulty * 2
-                self.map_height, self.map_width = self.rows * 2 + 1, self.cols * 2 + 1
-                self.game.map.mini_map = generate_grid_maze(self.rows, self.cols, self.map_height, self.map_width)
-                self.game.map.world_map = {}
-                self.game.map.get_map()
-
                 self.game.curr_menu = self.game.main_menu
             self.run_display = False
 
@@ -566,6 +567,13 @@ class GameoverMenu(Menu):
         self.move_cursor()
         if self.START_KEY:
             if self.state == 'Retry':
+                # Reloads map
+                rows, cols = 8 + self.game.difficulty_menu.difficulty * 2, 8 + self.game.difficulty_menu.difficulty * 2
+                map_height, map_width = rows * 2 + 1, cols * 2 + 1
+                self.game.map.mini_map = generate_grid_maze(rows, cols, map_height, map_width)
+                self.game.map.world_map = {}
+                self.game.map.get_map()
+                
                 self.game.effects_sounds['ambient_music'].play(loops=-1)
                 self.game.new_game()
                 self.game.playing = True
@@ -624,6 +632,13 @@ class WinMenu(Menu):
     def move_cursor(self):
         if self.DOWN_KEY or self.UP_KEY:
             if self.state == 'Retry':
+                # Reloads map
+                rows, cols = 8 + self.game.difficulty_menu.difficulty * 2, 8 + self.game.difficulty_menu.difficulty * 2
+                map_height, map_width = rows * 2 + 1, cols * 2 + 1
+                self.game.map.mini_map = generate_grid_maze(rows, cols, map_height, map_width)
+                self.game.map.world_map = {}
+                self.game.map.get_map()
+
                 self.cursor_rect.midtop = (self.exitx + self.offset, self.exity)
                 self.state = 'Exit'
             elif self.state == 'Exit':

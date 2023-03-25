@@ -18,8 +18,13 @@ ICON = 'resources/textures/game_icon.ico'
 
 # Music and sound effects
 MENU_MUSIC = 'resources/music/menu_music.mp3'
+NPC1_CHASE = 'resources/music/npc1_chase_music.mp3'
+NPC2_CHASE = 'resources/music/npc2_chase_music.mp3'
+NPC3_CHASE = 'resources/music/npc3_chase_music.mp3'
+NPC4_CHASE = 'resources/music/npc4_chase_music.mp3'
+
 EFFECT_SOUNDS = {
-                'chase_music':     'resources/music/chase_music.mp3',
+                'chase_music':     'resources/music/npc1_chase_music.mp3',
                 'ambient_music':   'resources/music/ambient_music.mp3',
                 'ambient1':        'resources/sounds/ambient_noise1.wav',
                 'ambient2':        'resources/sounds/ambient_noise2.wav',
