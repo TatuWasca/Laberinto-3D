@@ -1,10 +1,11 @@
 import pygame as pg
+import math
 from random import randrange, choice, randint
+from os import path
 from src.settings import *
+from src.sprite_object import *
+from src.npc import *
 from decimal import Decimal
-from colorama import init, Fore
-
-init()
 
 class Map:
     def __init__(self, game):
@@ -38,23 +39,40 @@ class Map:
             self.mini_map = generate_grid_maze(self.rows, self.cols, self.map_height, self.map_width)
             self.posible_spawns = []
             self.world_map = {}
+            self.exit_spawn, self.door_spawn, self.key_spawn, self.npc_spawn, self.player_spawn = (), (), (), (), ()
 
             # Get all exit positions and choose one, then filter it out
             for y in range(self.map_height):
                 for x in range(self.map_width):
                     if self.mini_map[y][x] == 0:
                         exits = 0
+                        e_posx, e_posy = x, y
                         if self.mini_map[y][x + 1] == 0:
                             exits += 1
+                            e_posy, e_posx = y, x + 1
                         if self.mini_map[y][x - 1] == 0:
                             exits += 1
+                            e_posy, e_posx = y, x - 1
                         if self.mini_map[y + 1][x] == 0:
                             exits += 1
+                            e_posy, e_posx = y + 1, x
                         if self.mini_map[y - 1][x] == 0:
                             exits += 1
+                            e_posy, e_posx = y - 1, x
 
                         if exits == 1:
-                            self.posible_spawns.append((x, y))
+                            exits = 0
+                            if self.mini_map[e_posy][e_posx + 1] == 0:
+                                exits += 1
+                            if self.mini_map[e_posy][e_posx - 1] == 0:
+                                exits += 1
+                            if self.mini_map[e_posy + 1][e_posx] == 0:
+                                exits += 1
+                            if self.mini_map[e_posy - 1][e_posx] == 0:
+                                exits += 1
+                            
+                            if exits == 2:
+                                self.posible_spawns.append((x, y))
             
             # Check for exits with at least 2 tiles of depth
             valid_exit_spawns = []
@@ -105,30 +123,58 @@ class Map:
                 npc_spawn = choice(self.posible_spawns)
                 self.npc_spawn = float(Decimal(npc_spawn[0]) + Decimal('0.5')), float(Decimal(npc_spawn[1]) + Decimal('0.5'))
                 break
+    
+    def change_map_playing(self):
+        self.get_spawns()
+        self.visited = []
+
+        if not(self.game.object_handler.npc.chaise_audio):
+            self.game.effects_sounds['chase_music'].fadeout(1000)
+            self.game.effects_sounds['ambient_music'].play(loops=-1)
+
+        self.game.player.x, self.game.player.y = self.player_spawn
+        self.game.object_handler.npc = NPC(self.game, path.join(self.game.root_file, self.game.curr_npc), self.npc_spawn, 0.9, 0.1, 90)
+
+        if not(self.game.object_handler.picked):
+            self.game.object_handler.key = SpriteObject(self.game, path.join(self.game.root_file,'resources/sprites/static/key.png'), self.key_spawn, 0.3, 0.7)
+            self.game.object_handler.key_rect = pg.Rect((self.key_spawn[0] - 0.25) * 100, (self.key_spawn[1] - 0.25) * 100, 25, 25)  
+        else:
+            self.mini_map[self.door_spawn[0]][self.door_spawn[1]] = 0
+
+        self.get_map()
+        self.game.pathfinding.map = self.mini_map
+        self.game.pathfinding.graph = {}
+        self.game.pathfinding.path = []
+        self.game.pathfinding.get_graph() 
+
+        self.game.player.noise_pos = self.game.player.map_pos
+        self.game.object_handler.npc.searching, self.game.object_handler.npc.roaming, self.game.object_handler.npc.chasing = True, False, False 
         
     def draw(self):
         if self.toggle_map:
             # Draw map and visited tiles
-            [pg.draw.rect(self.game.screen, 'darkgray', (pos[0] * 14 + MONITOR_W/2 - self.map_width/2 * 14, pos[1] * 14 + MONITOR_H/2 - self.map_height/2 * 14, 14, 14))
+            [pg.draw.rect(self.game.screen, 'black', (pos[0] * 14 + MONITOR_W/2 - self.map_width/2 * 14, pos[1] * 14 + MONITOR_H/2 - self.map_height/2 * 14, 14, 14))
             for pos in self.world_map]
-            [pg.draw.rect(self.game.screen, 'blue', (pos[0] * 14 + MONITOR_W/2 - self.map_width/2 * 14, pos[1] * 14 + MONITOR_H/2 - self.map_height/2 * 14, 14, 14))
+            [pg.draw.rect(self.game.screen, 'white', (pos[0] * 14 + MONITOR_W/2 - self.map_width/2 * 14, pos[1] * 14 + MONITOR_H/2 - self.map_height/2 * 14, 14, 14))
             for pos in self.visited]
 
             # Draw player
             player_pos = self.game.player.map_pos
-            pg.draw.circle(self.game.screen, 'green', (player_pos[0] * 14 + MONITOR_W/2 - self.map_width/2 * 14 + 7, player_pos[1] * 14 + MONITOR_H/2 - self.map_height/2 * 14 + 7), 7)
+            pg.draw.circle(self.game.screen, 'blue', (player_pos[0] * 14 + MONITOR_W/2 - self.map_width/2 * 14 + 7, player_pos[1] * 14 + MONITOR_H/2 - self.map_height/2 * 14 + 7), 7)
             
             # Draw pathfinding tiles
             # if not(self.game.object_handler.npc.roaming):
-            #   path = self.game.pathfinding.path
-            #   for i in path:
-            #       pg.draw.rect(self.game.screen, 'yellow', (i[0] * 14 + MONITOR_W/2 - self.map_width/2 * 14 + 3.5, i[1] * 14 + MONITOR_H/2 - self.map_height/2 * 14 + 3.5, 7, 7))
+            #     path = self.game.pathfinding.path
+            #     for i in path:
+            #         pg.draw.rect(self.game.screen, 'yellow', (i[0] * 14 + MONITOR_W/2 - self.map_width/2 * 14 + 3.5, i[1] * 14 + MONITOR_H/2 - self.map_height/2 * 14 + 3.5, 7, 7))
             
             # Draw NPC, exit and key
             # npc_pos = self.game.object_handler.npc.map_pos
-            # pg.draw.circle(self.game.screen, 'lightgrey', (npc_pos[0] * 14 + MONITOR_W/2 - self.map_width/2 * 14 + 7, npc_pos[1] * 14 + MONITOR_H/2 - self.map_height/2 * 14 + 7), 7)
-            # pg.draw.rect(self.game.screen, 'purple', ((self.key_spawn[0] - 0.5) * 14 + MONITOR_W/2 - self.map_width/2 * 14, (self.key_spawn[1] - 0.5) * 14 + MONITOR_H/2 - self.map_height/2 * 14 - 0.5, 14, 14))
+            # pg.draw.circle(self.game.screen, 'red', (npc_pos[0] * 14 + MONITOR_W/2 - self.map_width/2 * 14 + 7, npc_pos[1] * 14 + MONITOR_H/2 - self.map_height/2 * 14 + 7), 7)
+            # pg.draw.rect(self.game.screen, 'purple', ((self.key_spawn[0] - 0.5) * 14 + MONITOR_W/2 - self.map_width/2 * 14, (self.key_spawn[1] - 0.5) * 14 + MONITOR_H/2 - self.map_height/2 * 14, 14, 14))
             # pg.draw.rect(self.game.screen, 'yellow', (self.door_spawn[1] * 14 + MONITOR_W/2 - self.map_width/2 * 14, self.door_spawn[0] * 14 + MONITOR_H/2 - self.map_height/2 * 14, 14, 14))
+            # pg.draw.rect(self.game.screen, 'brown', (self.exit_spawn[0] * 14 + MONITOR_W/2 - self.map_width/2 * 14, self.exit_spawn[1] * 14 + MONITOR_H/2 - self.map_height/2 * 14, 14, 14))
+
 
 
 class Cell:
@@ -275,7 +321,7 @@ def generate_grid_maze(rows, cols, m_height, m_width):
                     map[x][y] = num
         
         # Eliminate some walls randomly so the maze is fair
-        for i in range(10 * ((rows - 5) // 2)):
+        for i in range(30 * ((rows - 5) // 2)):
             y = randint(1, m_height - 2)
             x = randint(1, m_width - 2)
             if map[y][x] != 0:

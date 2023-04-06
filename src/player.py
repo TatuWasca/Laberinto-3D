@@ -36,7 +36,7 @@ class Player:
             if not(self.game.object_handler.npc.chasing):
                 self.noise_pos = self.map_pos
                 self.game.object_handler.npc.roaming, self.game.object_handler.npc.searching = False, True
-            self.stamina -= Decimal('0.25')
+            self.stamina -= Decimal('0.5')
         elif float(self.stamina) < 150:
             self.stamina += Decimal('0.25')
             self.resting = True

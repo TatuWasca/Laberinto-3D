@@ -10,8 +10,8 @@ DARKGREY = (78, 78, 78)
 
 # Game settings
 MONITOR_W, MONITOR_H = get_monitors()[0].width, get_monitors()[0].height
-HALF_WIDTH, WIDTH = MONITOR_W // 2, MONITOR_W // 4
-HALF_HEIGHT, HEIGHT = MONITOR_H // 2, MONITOR_W // 4
+HALF_WIDTH, WIDTH = MONITOR_W // 2, MONITOR_W // 2
+HALF_HEIGHT, HEIGHT = MONITOR_H // 2, MONITOR_W // 2
 FPS = 90
 FONT = 'resources/font/PixeloidMono-VGj6x.ttf'
 ICON = 'resources/textures/game_icon.ico'

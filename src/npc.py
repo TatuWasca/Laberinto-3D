@@ -65,13 +65,12 @@ class NPC(AnimatedSprite):
             # Checks between three states: roaming, searching and chasing
             if self.roaming:
                 # Every 15 seconds, there is a 5% chance of playing an ambient sound and npc gettting players position
-                if now > self.ambient_noise_chance_time:
-                    if random.randrange(0,100) <= 5:
+                if now > self.ambient_noise_chance_time and not(self.chasing):
+                    if random.randrange(0, 100) <= 5:
                         sound = random.randrange(1, 3)
                         self.game.effects_sounds['ambient' + str(sound)].play()
 
-                        self.game.player.noise_pos = self.game.player.map_pos
-                        self.searching, self.roaming, self.chasing = True, False, False
+                        self.game.map.change_map_playing()
                     else:
                         self.ambient_noise_chance_time = now + 10000   
 
@@ -102,6 +101,7 @@ class NPC(AnimatedSprite):
                     self.game.effects_sounds['ambient_music'].play(loops=-1)
                     self.chaise_audio = True
                     self.screen_effect = False
+
                 # Calculates the next position
                 next_pos = self.game.pathfinding.get_path(self.map_pos, self.game.player.noise_pos)
                 next_x, next_y = next_pos  
@@ -124,6 +124,7 @@ class NPC(AnimatedSprite):
                         self.game.effects_sounds['npc_scream'].play()
                     self.chaise_audio = False
                 self.chasing_time = pg.time.get_ticks() + 5000
+
                 # Calculates the next position
                 next_pos = self.game.pathfinding.get_path(self.map_pos, self.game.player.map_pos)
                 next_x, next_y = next_pos  

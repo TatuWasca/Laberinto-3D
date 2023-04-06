@@ -30,9 +30,7 @@ class ObjectHandler:
             self.game.effects_sounds['key_grab'].play()
             
             # Reloads map
-            self.game.map.mini_map[self.game.map.door_spawn[0]][self.game.map.door_spawn[1]] = False
-            self.game.map.world_map = {}
-            self.game.map.get_map()
+            self.game.map.change_map_playing()
 
     def display_text(self):
         now = pg.time.get_ticks() 

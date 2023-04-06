@@ -19,7 +19,7 @@ class Game:
         pg.mixer.pre_init(frequency=44100, size=32, channels=2, buffer=512)
         pg.display.set_icon(pg.image.load(path.join(root_path, ICON)))
         pg.display.set_caption('Laberinto 3D')
-        self.screen = pg.display.set_mode((0,0), pg.FULLSCREEN)
+        self.screen = pg.display.set_mode((0,0), pg.FULLSCREEN | pg.SRCALPHA)
         self.clock = pg.time.Clock()
         self.delta_time = 1
         self.root_file = root_path
@@ -65,6 +65,10 @@ class Game:
 
         self.playing = False
 
+        self.dark_filter = self.screen.copy()
+        self.dark_filter.fill((0, 0, 0))
+        self.dark_filter.set_alpha(200)
+
     def new_game(self):
         self.map = Map(self)
         self.player = Player(self)
@@ -91,7 +95,10 @@ class Game:
                     self.curr_menu.display_menu()
                 if event.key == pg.K_TAB:
                     self.map.toggle_map = not(self.map.toggle_map)
-
+                # Creates a new map in-game. Useful debug tool
+                # if event.key == pg.K_p:
+                #   self.map.change_map_playing()
+                    
     def update(self):
         self.player.update()
         self.raycasting.update()
@@ -106,6 +113,8 @@ class Game:
             self.draw_hud()
     
     def draw_hud(self):
+        if self.object_handler.picked:
+            self.screen.blit(self.dark_filter, (0,0))
         # Fps
         self.draw_text('FPS: ' +  "{:.0f}".format(self.clock.get_fps()),10, 5, 10, 'left')
         # Map
@@ -113,9 +122,9 @@ class Game:
         # Stamina bar
         self.pathfinding.get_path(self.object_handler.npc.map_pos, self.player.map_pos)
         color = 'white'
-        if len(self.pathfinding.path) <= 15:
+        if len(self.pathfinding.path) <= 10:
             color = 'red'
-        elif len(self.pathfinding.path) <= 30:
+        elif len(self.pathfinding.path) <= 20:
             color = 'yellow'
         else:
             color = 'white'
