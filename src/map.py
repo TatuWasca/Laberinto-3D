@@ -1,6 +1,6 @@
 import pygame as pg
 import math
-from random import randrange, choice, randint
+from random import randrange, choice, randint, shuffle
 from os import path
 from src.settings import *
 from src.sprite_object import *
@@ -36,7 +36,7 @@ class Map:
     def get_spawns(self):
         # Loop that doble checks if the map is valid
         while True:
-            self.mini_map = generate_grid_maze(self.rows, self.cols, self.map_height, self.map_width)
+            self.mini_map = self.generate_maze(self.map_height, self.map_width)
             self.posible_spawns = []
             self.world_map = {}
             self.exit_spawn, self.door_spawn, self.key_spawn, self.npc_spawn, self.player_spawn = (), (), (), (), ()
@@ -92,7 +92,7 @@ class Map:
                         valid_exit_spawns.append((x,y))
             self.exit_spawn = choice(valid_exit_spawns)
             self.mini_map[self.exit_spawn[1]][self.exit_spawn[0]] = 5
-            self.posible_spawns = list(filter_spawns(self.exit_spawn, self.posible_spawns, self.map_width, self.map_height))
+            self.posible_spawns = list(self.filter_spawns(self.exit_spawn, self.posible_spawns, self.map_width, self.map_height))
 
             # Based on exit position, get door position
             e_x, e_y = self.exit_spawn
@@ -109,13 +109,13 @@ class Map:
             # Get player spawn
             if len(self.posible_spawns) > 1:
                 player_spawn = choice(self.posible_spawns)
-                self.posible_spawns = list(filter_spawns(player_spawn, self.posible_spawns, self.map_width, self.map_height))
+                self.posible_spawns = list(self.filter_spawns(player_spawn, self.posible_spawns, self.map_width, self.map_height))
                 self.player_spawn = float(Decimal(player_spawn[0]) + Decimal('0.5')), float(Decimal(player_spawn[1]) + Decimal('0.5'))
 
             # Get key spawn
             if len(self.posible_spawns) > 1:
                 key_spawn = choice(self.posible_spawns)
-                self.posible_spawns = list(filter_spawns(key_spawn, self.posible_spawns, self.map_width, self.map_height))
+                self.posible_spawns = list(self.filter_spawns(key_spawn, self.posible_spawns, self.map_width, self.map_height))
                 self.key_spawn = float(Decimal(key_spawn[0]) + Decimal('0.5')), float(Decimal(key_spawn[1]) + Decimal('0.5'))
 
             # Get npc spawn
@@ -124,6 +124,41 @@ class Map:
                 self.npc_spawn = float(Decimal(npc_spawn[0]) + Decimal('0.5')), float(Decimal(npc_spawn[1]) + Decimal('0.5'))
                 break
     
+    def generate_maze(self, width, height):
+        maze = [[1] * width for _ in range(height)]  # initialize maze with all walls
+
+        # create pathways starting from a random point
+        x, y = 1, 1
+        maze[y][x] = 0  # mark starting point as a pathway
+        self.generate_path(x, y, maze)
+
+        # Eliminate some walls randomly so the maze is fair
+        for i in range(20 * ((self.rows - 5) // 2)):
+            y = randint(1, self.map_height - 2)
+            x = randint(1, self.map_width - 2)
+            if maze[y][x] != 0:
+                if maze[y][x + 1] == 0 and maze[y][x - 1] == 0:
+                    if maze[y + 1][x] in [1, 2, 3] and maze[y - 1][x] in [1, 2, 3]:
+                        maze[y][x] = 0
+                elif maze[y + 1][x] == 0 and maze[y - 1][x] == 0:
+                    if maze[y][x + 1] in [1, 2, 3] and maze[y][x - 1] in [1, 2, 3]:
+                        maze[y][x] = 0
+        return maze
+
+    def generate_path(self, x, y, maze):
+        directions = [(0, -2), (2, 0), (0, 2), (-2, 0)]  # possible directions to move
+
+        shuffle(directions)  # randomize the order in which directions are tried
+
+        for dx, dy in directions:
+            next_x, next_y = x + dx, y + dy
+
+            if 0 <= next_x < len(maze[0]) and 0 <= next_y < len(maze) and maze[next_y][next_x] == 1:
+                # check if the next cell is a wall and is within bounds
+                maze[y + dy // 2][x + dx // 2] = 0  # remove wall between current and next cell
+                maze[next_y][next_x] = 0  # mark next cell as a pathway
+                self.generate_path(next_x, next_y, maze)  # continue generating pathways from next cell
+
     def change_map_playing(self):
         self.get_spawns()
         self.visited = []
@@ -149,7 +184,22 @@ class Map:
 
         self.game.player.noise_pos = self.game.player.map_pos
         self.game.object_handler.npc.searching, self.game.object_handler.npc.roaming, self.game.object_handler.npc.chasing = True, False, False 
-        
+    
+    def filter_spawns(self, target_spawn, spawns, m_width, m_height):
+        # Filters out all the possible spawns that are not in the target spawn
+        spawn = []
+        if target_spawn[0] < m_width / 2:
+            if target_spawn[1] < m_height / 2:
+                spawn = filter(lambda y: (not(y[0] < m_width/2 and y[1] < m_height/2)), spawns) # Top Left Corner
+            elif target_spawn[1] > m_height / 2:
+                spawn = filter(lambda y: (not(y[0] < m_width/2 and y[1] > m_height/2)), spawns) # Bottom left Corner
+        elif target_spawn[0] > m_width / 2:
+            if target_spawn[1] < m_height / 2 :
+                spawn = filter(lambda y: (not(y[0] > m_width/2 and y[1] < m_height/2)), spawns) # Top right Corner
+            elif target_spawn[1] > m_height / 2:
+                spawn = filter(lambda y: (not(y[0] > m_width/2 and y[1] > m_height/2)), spawns) # Bottom right Corner
+        return spawn
+
     def draw(self):
         if self.toggle_map:
             # Draw map and visited tiles
@@ -174,195 +224,3 @@ class Map:
             # pg.draw.rect(self.game.screen, 'purple', ((self.key_spawn[0] - 0.5) * 14 + MONITOR_W/2 - self.map_width/2 * 14, (self.key_spawn[1] - 0.5) * 14 + MONITOR_H/2 - self.map_height/2 * 14, 14, 14))
             # pg.draw.rect(self.game.screen, 'yellow', (self.door_spawn[1] * 14 + MONITOR_W/2 - self.map_width/2 * 14, self.door_spawn[0] * 14 + MONITOR_H/2 - self.map_height/2 * 14, 14, 14))
             # pg.draw.rect(self.game.screen, 'brown', (self.exit_spawn[0] * 14 + MONITOR_W/2 - self.map_width/2 * 14, self.exit_spawn[1] * 14 + MONITOR_H/2 - self.map_height/2 * 14, 14, 14))
-
-
-
-class Cell:
-    def __init__(self, x, y, cols, rows):
-        self.x, self.y = x, y
-        self.cols, self.rows = cols, rows
-        self.walls = {'top': True, 'right': True, 'bottom': True, 'left': True}
-        self.visited = False
-        self.thickness = 4
-
-    def check_cell(self, x, y):
-        find_index = lambda x, y: x + y * self.cols
-        if x < 0 or x > self.cols - 1 or y < 0 or y > self.rows - 1:
-            return False
-        return self.grid_cells[find_index(x, y)]
-
-    def check_neighbors(self, grid_cells):
-        self.grid_cells = grid_cells
-        neighbors = []
-        top = self.check_cell(self.x, self.y - 1)
-        right = self.check_cell(self.x + 1, self.y)
-        bottom = self.check_cell(self.x, self.y + 1)
-        left = self.check_cell(self.x - 1, self.y)
-        if top and not top.visited:
-            neighbors.append(top)
-        if right and not right.visited:
-            neighbors.append(right)
-        if bottom and not bottom.visited:
-            neighbors.append(bottom)
-        if left and not left.visited:
-            neighbors.append(left)
-        return choice(neighbors) if neighbors else False
-
-
-# Functions for generating the maze
-def filter_spawns(target_spawn, spawns, m_width, m_height):
-    # Filters out all the possible spawns that are not in the target spawn
-    spawn = []
-    if target_spawn[0] < m_width / 2:
-        if target_spawn[1] < m_height / 2:
-            spawn = filter(lambda y: (not(y[0] < m_width/2 and y[1] < m_height/2)), spawns) # Top Left Corner
-        elif target_spawn[1] > m_height / 2:
-            spawn = filter(lambda y: (not(y[0] < m_width/2 and y[1] > m_height/2)), spawns) # Bottom left Corner
-    elif target_spawn[0] > m_width / 2:
-        if target_spawn[1] < m_height / 2 :
-            spawn = filter(lambda y: (not(y[0] > m_width/2 and y[1] < m_height/2)), spawns) # Top right Corner
-        elif target_spawn[1] > m_height / 2:
-            spawn = filter(lambda y: (not(y[0] > m_width/2 and y[1] > m_height/2)), spawns) # Bottom right Corner
-    return spawn
-
-def remove_walls(current, next):
-    dx = current.x - next.x
-    if dx == 1:
-        current.walls['left'] = False
-        next.walls['right'] = False
-    elif dx == -1:
-        current.walls['right'] = False
-        next.walls['left'] = False
-    dy = current.y - next.y
-    if dy == 1:
-        current.walls['top'] = False
-        next.walls['bottom'] = False
-    elif dy == -1:
-        current.walls['bottom'] = False
-        next.walls['top'] = False
-
-def generate_maze(rows, cols):
-    grid_cells = [Cell(col, row, cols, rows) for row in range(rows) for col in range(cols)]
-    current_cell = grid_cells[0]
-    array = []
-    break_count = 1
-
-    while break_count != len(grid_cells):
-        current_cell.visited = True
-        next_cell = current_cell.check_neighbors(grid_cells)
-        if next_cell:
-            next_cell.visited = True
-            break_count += 1
-            array.append(current_cell)
-            remove_walls(current_cell, next_cell)
-            current_cell = next_cell
-        elif array:
-            current_cell = array.pop()
-    return grid_cells
-
-def generate_grid_maze(rows, cols, m_height, m_width):
-    map = []
-    
-    # Loop for creating a map and keeping it if its valid
-    while True:
-        map = []
-        # Only way I could find of passing a cell map to a grid like map including walls
-        grid_cells = generate_maze(rows, cols)
-        row = []
-        # Generate a map taking in account the walls
-        for y in range(m_height):
-            for x in range(m_width):
-                row.append('u')
-            map.append(row)
-            row = []
-        test = []
-        # Get all cell positions and walls and sort them
-        for i in grid_cells:
-            test.append((i.x, i.y, i.walls))
-        test.sort()
-
-        # Generate the grid map
-        ctr_y = 1
-        ctr_x = 1
-        mul = 1
-        for i, cell in enumerate(test):
-            num = randint(1,3)
-            if (i + 1) % (rows * mul) == 0:
-                map[cell[1] + ctr_x][cell[0] + ctr_y] = 0
-                if cell[2]['left']:
-                    map[cell[1] + ctr_x][cell[0] + ctr_y - 1] = num
-                else:
-                    map[cell[1] + ctr_x][cell[0] + ctr_y - 1] = 0
-                if cell[2]['top']:
-                    map[cell[1] + ctr_x - 1][cell[0] + ctr_y] = num
-                else:
-                    map[cell[1] + ctr_x - 1][cell[0] + ctr_y] = 0
-
-                ctr_y += 1
-                ctr_x = 1
-                mul += 1
-            else:
-                map[cell[1] + ctr_x][cell[0] + ctr_y] = 0
-                if cell[2]['left']:
-                    map[cell[1] + ctr_x][cell[0] + ctr_y - 1] = num
-                else:
-                    map[cell[1] + ctr_x][cell[0] + ctr_y - 1] = 0
-                if cell[2]['top']:
-                    map[cell[1] + ctr_x - 1][cell[0] + ctr_y] = num
-                else:
-                    map[cell[1] + ctr_x - 1][cell[0] + ctr_y] = 0
-                ctr_x += 1
-        
-        # Reeplace all remainding parts with walls
-        for y in range(m_height):
-            for x in range(m_width):
-                num = randint(1,3)
-                if map[x][y] == 'u':        
-                    map[x][y] = num
-        
-        # Eliminate some walls randomly so the maze is fair
-        for i in range(30 * ((rows - 5) // 2)):
-            y = randint(1, m_height - 2)
-            x = randint(1, m_width - 2)
-            if map[y][x] != 0:
-                if map[y][x + 1] == 0 and map[y][x - 1] == 0:
-                    if map[y + 1][x] in [1, 2, 3] and map[y - 1][x] in [1, 2, 3]:
-                        map[y][x] = 0
-                elif map[y + 1][x] == 0 and map[y - 1][x] == 0:
-                    if map[y][x + 1] in [1, 2, 3] and map[y][x - 1] in [1, 2, 3]:
-                        map[y][x] = 0
-        
-        # Get all exit positions
-        posible_exits = []
-        for y in range(m_height):
-            for x in range(m_width):
-                if map[y][x] == 0:
-                    exits = 0
-                    if map[y][x + 1] == 0:
-                        exits += 1
-                    if map[y][x - 1] == 0:
-                        exits += 1
-                    if map[y + 1][x] == 0:
-                        exits += 1
-                    if map[y - 1][x] == 0:
-                        exits += 1
-
-                    if exits == 1:
-                        posible_exits.append((x,y))    
-
-        # Make sure there is at least one possible exit in all 4 quadrants, else remake the map
-        if len(posible_exits) > 8:
-            posible_exits = list(filter_spawns(choice(posible_exits), posible_exits, m_width, m_height))
-
-            if len(posible_exits) > 6:
-                posible_exits = list(filter_spawns(choice(posible_exits), posible_exits, m_width, m_height))
-
-                if len(posible_exits) > 4:
-                    posible_exits = list(filter_spawns(choice(posible_exits), posible_exits, m_width, m_height))
-
-                    if len(posible_exits) > 2:
-                        posible_exits = list(filter_spawns(choice(posible_exits), posible_exits, m_width, m_height))
-
-                        if len(posible_exits) == 0:
-                            break
-    return map

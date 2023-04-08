@@ -97,7 +97,7 @@ class Game:
                     self.map.toggle_map = not(self.map.toggle_map)
                 # Creates a new map in-game. Useful debug tool
                 # if event.key == pg.K_p:
-                #   self.map.change_map_playing()
+                #     self.map.change_map_playing()
                     
     def update(self):
         self.player.update()
