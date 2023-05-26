@@ -20,7 +20,7 @@ class NPC(AnimatedSprite):
         self.chaise_audio = True
         self.screen_effect_time = 350
         self.chasing_time = pg.time.get_ticks() + 5000
-        self.ambient_noise_chance_time = 15000
+        self.ambient_noise_chance_time = pg.time.get_ticks() + 1000
 
     def update(self):
         self.check_animation_time()
@@ -59,7 +59,6 @@ class NPC(AnimatedSprite):
                 self.next_mob_movement = now + 5
                 self.ambient_noise_chance = now + 15000
 
-            self.check_collision()
             self.check_state()
 
             # Checks between three states: roaming, searching and chasing
@@ -137,12 +136,6 @@ class NPC(AnimatedSprite):
 
         # Positions the npc rect in the grid
         self.npc_rect.center = (self.x * 100, self.y * 100)
-            
-    def check_collision(self):
-        if self.npc_rect.colliderect(self.game.player.player_rect):
-            self.game.object_handler.game_over()
-        elif self.npc_rect.colliderect(self.game.player.player_rect):
-            self.game.object_handler.win()
 
     def check_state(self):
         self.ray_cast_value = self.ray_cast_player_npc()

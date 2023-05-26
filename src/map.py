@@ -72,30 +72,15 @@ class Map:
                                 exits += 1
                             
                             if exits == 2:
-                                self.posible_spawns.append((x, y))
+                                self.posible_spawns.append((y, x))
             
             # Check for exits with at least 2 tiles of depth
-            valid_exit_spawns = []
-            for spawn in self.posible_spawns:
-                x, y = spawn
-                if self.mini_map[y][x + 1] == 0:
-                    if self.mini_map[y][x + 2] == 0:
-                        valid_exit_spawns.append((x,y))
-                if self.mini_map[y][x - 1] == 0:
-                    if self.mini_map[y][x - 2] == 0:
-                        valid_exit_spawns.append((x,y))
-                if self.mini_map[y + 1][x] == 0:
-                    if self.mini_map[y + 2][x] == 0:
-                        valid_exit_spawns.append((x,y))
-                if self.mini_map[y - 1][x] == 0:
-                    if self.mini_map[y - 2][x] == 0:
-                        valid_exit_spawns.append((x,y))
-            self.exit_spawn = choice(valid_exit_spawns)
-            self.mini_map[self.exit_spawn[1]][self.exit_spawn[0]] = 5
+            self.exit_spawn = choice(self.posible_spawns)
+            self.mini_map[self.exit_spawn[0]][self.exit_spawn[1]] = 5
             self.posible_spawns = list(self.filter_spawns(self.exit_spawn, self.posible_spawns, self.map_width, self.map_height))
 
             # Based on exit position, get door position
-            e_x, e_y = self.exit_spawn
+            e_y, e_x = self.exit_spawn
             if self.mini_map[e_y - 1][e_x] not in [1, 2, 3]:
                 self.door_spawn = (e_y - 1, e_x)
             elif self.mini_map[e_y][e_x + 1] not in [1, 2, 3]:
@@ -110,18 +95,19 @@ class Map:
             if len(self.posible_spawns) > 1:
                 player_spawn = choice(self.posible_spawns)
                 self.posible_spawns = list(self.filter_spawns(player_spawn, self.posible_spawns, self.map_width, self.map_height))
-                self.player_spawn = float(Decimal(player_spawn[0]) + Decimal('0.5')), float(Decimal(player_spawn[1]) + Decimal('0.5'))
+                self.player_spawn = float(Decimal(player_spawn[1]) + Decimal('0.5')), float(Decimal(player_spawn[0]) + Decimal('0.5'))
 
             # Get key spawn
             if len(self.posible_spawns) > 1:
                 key_spawn = choice(self.posible_spawns)
                 self.posible_spawns = list(self.filter_spawns(key_spawn, self.posible_spawns, self.map_width, self.map_height))
-                self.key_spawn = float(Decimal(key_spawn[0]) + Decimal('0.5')), float(Decimal(key_spawn[1]) + Decimal('0.5'))
+                self.key_spawn = float(Decimal(key_spawn[1]) + Decimal('0.5')), float(Decimal(key_spawn[0]) + Decimal('0.5'))
 
             # Get npc spawn
             if len(self.posible_spawns) > 1:
                 npc_spawn = choice(self.posible_spawns)
-                self.npc_spawn = float(Decimal(npc_spawn[0]) + Decimal('0.5')), float(Decimal(npc_spawn[1]) + Decimal('0.5'))
+                self.npc_spawn = float(Decimal(npc_spawn[1]) + Decimal('0.5')), float(Decimal(npc_spawn[0]) + Decimal('0.5'))
+                
                 break
     
     def generate_maze(self, width, height):
@@ -223,4 +209,4 @@ class Map:
             # pg.draw.circle(self.game.screen, 'red', (npc_pos[0] * 14 + MONITOR_W/2 - self.map_width/2 * 14 + 7, npc_pos[1] * 14 + MONITOR_H/2 - self.map_height/2 * 14 + 7), 7)
             # pg.draw.rect(self.game.screen, 'purple', ((self.key_spawn[0] - 0.5) * 14 + MONITOR_W/2 - self.map_width/2 * 14, (self.key_spawn[1] - 0.5) * 14 + MONITOR_H/2 - self.map_height/2 * 14, 14, 14))
             # pg.draw.rect(self.game.screen, 'yellow', (self.door_spawn[1] * 14 + MONITOR_W/2 - self.map_width/2 * 14, self.door_spawn[0] * 14 + MONITOR_H/2 - self.map_height/2 * 14, 14, 14))
-            # pg.draw.rect(self.game.screen, 'brown', (self.exit_spawn[0] * 14 + MONITOR_W/2 - self.map_width/2 * 14, self.exit_spawn[1] * 14 + MONITOR_H/2 - self.map_height/2 * 14, 14, 14))
+            # pg.draw.rect(self.game.screen, 'brown', (self.exit_spawn[1] * 14 + MONITOR_W/2 - self.map_width/2 * 14, self.exit_spawn[0] * 14 + MONITOR_H/2 - self.map_height/2 * 14, 14, 14))

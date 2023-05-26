@@ -16,6 +16,7 @@ class ObjectHandler:
     
     def update(self):
         self.npc.update()
+        self.check_game_over()
         if not(self.picked): 
             self.key.update()
             self.check_pick_key()
@@ -40,6 +41,10 @@ class ObjectHandler:
     def check_win(self):
         if self.game.player.map_pos == (self.game.map.door_spawn[1], self.game.map.door_spawn[0]):
             self.win()
+    
+    def check_game_over(self):
+        if self.npc.npc_rect.colliderect(self.game.player.player_rect):
+            self.game_over()
 
     def game_over(self):
         self.game.curr_menu = self.game.gameover_menu

@@ -568,13 +568,6 @@ class GameoverMenu(Menu):
         if self.START_KEY:
             if self.state == 'Retry':
                 # Reloads map
-                rows, cols = 8 + self.game.difficulty_menu.difficulty * 2, 8 + self.game.difficulty_menu.difficulty * 2
-                map_height, map_width = rows * 2 + 1, cols * 2 + 1
-                self.game.map.mini_map = generate_grid_maze(rows, cols, map_height, map_width)
-                self.game.map.world_map = {}
-                self.game.map.get_map()
-                
-                self.game.effects_sounds['ambient_music'].play(loops=-1)
                 self.game.new_game()
                 self.game.playing = True
             elif self.state == 'Exit':
@@ -632,13 +625,6 @@ class WinMenu(Menu):
     def move_cursor(self):
         if self.DOWN_KEY or self.UP_KEY:
             if self.state == 'Retry':
-                # Reloads map
-                rows, cols = 8 + self.game.difficulty_menu.difficulty * 2, 8 + self.game.difficulty_menu.difficulty * 2
-                map_height, map_width = rows * 2 + 1, cols * 2 + 1
-                self.game.map.mini_map = generate_grid_maze(rows, cols, map_height, map_width)
-                self.game.map.world_map = {}
-                self.game.map.get_map()
-
                 self.cursor_rect.midtop = (self.exitx + self.offset, self.exity)
                 self.state = 'Exit'
             elif self.state == 'Exit':
@@ -650,9 +636,8 @@ class WinMenu(Menu):
         self.move_cursor()
         if self.START_KEY:
             if self.state == 'Retry':
-                self.game.effects_sounds['ambient_music'].play(loops=-1)
-                self.game.playing = True
                 self.game.new_game()
+                self.game.playing = True
             elif self.state == 'Exit':
                 pg.mixer.music.load(path.join(self.game.root_file, MENU_MUSIC))
                 pg.mixer.music.set_volume(self.game.music_vol / 100)
