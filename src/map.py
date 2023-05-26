@@ -1,6 +1,6 @@
 import pygame as pg
 import math
-from random import randrange, choice, randint, shuffle
+from random import choice, randint, shuffle
 from os import path
 from src.settings import *
 from src.sprite_object import *
@@ -129,6 +129,10 @@ class Map:
                 elif maze[y + 1][x] == 0 and maze[y - 1][x] == 0:
                     if maze[y][x + 1] in [1, 2, 3] and maze[y][x - 1] in [1, 2, 3]:
                         maze[y][x] = 0
+        for y in range(self.map_height):
+            for x in range(self.map_width):
+                if maze[y][x] == 1:
+                    maze[y][x] = random.randint(1, 3)
         return maze
 
     def generate_path(self, x, y, maze):
